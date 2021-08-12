@@ -100,11 +100,6 @@ def zapsat_data(filename):
     print("Data zapsaná úspěšně do tabulky")
 
 
-def main2():
-    ziskat_vysledky(sys.argv[1])
-    zapsat_data(sys.argv[2])
-
-
 def main():
     try:
         get_soup(url)
@@ -114,6 +109,11 @@ def main():
     if "Page not found" in get_soup(url).select("h3")[0].text or nazev_csv[-4:] != ".csv":
         print("Musíte zadat správnou URL adresu a název CSV souboru\n---EXIT---")
         exit()
+    ziskat_vysledky(sys.argv[1])
+    zapsat_data(sys.argv[2])
+
+
+def main_old():
     ziskat_vysledky(url)
     zapsat_data(nazev_csv)
     print("Ukoncuji program projekt3.py")
