@@ -27,6 +27,8 @@ def ziskat_vysledky(url):
     while True:
         i += 1
         new_radek = []
+        if i>5:
+            break
         if soup.select("tr")[i].text.split("\n")[1] == "-":
             break
         if not str(soup.select("tr")[i].text.split("\n")[1]).isdigit():
@@ -78,6 +80,8 @@ def zapsat_data(filename):
 
 def main():
     try:
+        url=sys.argv[1]
+        nazev_csv=sys.argv[2]
         get_soup(url)
     except:
         print(
@@ -88,8 +92,8 @@ def main():
         print(
             "Musíte zadat správnou URL adresu a název CSV souboru\n---EXIT---")
         exit()
-    ziskat_vysledky(sys.argv[1])
-    zapsat_data(sys.argv[2])
+    ziskat_vysledky(url)
+    zapsat_data(nazev_csv)
 
 
 if __name__ == "__main__":
