@@ -2,13 +2,13 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 import csv
+import pandas as pd
 
 # url = "https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=12&xnumnuts=7103"  # prostějov
 # nazev_csv = "vysledky_prostejov.csv"
 
 csv_tabulka = ["kod obce", "nazev obce", "voliči v seznamu", "vydané obálky",
                "platné hlasy"]  # ,"kandidující strany"]
-
 tabulka = []
 
 
@@ -22,50 +22,58 @@ def get_soup(url):
 def ziskat_vysledky(url):
     soup = get_soup(url)
     print("Stahuji data z vybrané URL:", url)
-    ## Vytahnu cislo obce a jmeno obce
-    i = 0
-    while True:
-        i += 1
+    odkazy = stahnout_odkazy(soup)
+    cisla = uzemni_celek(url)[0]
+    obce = uzemni_celek(url)[1]
+    jmena_stran(odkazy[0])
+    for i in range(len(cisla)):
         new_radek = []
-        if i>5:
-            break
-        if soup.select("tr")[i].text.split("\n")[1] == "-":
-            break
-        if not str(soup.select("tr")[i].text.split("\n")[1]).isdigit():
-            continue
-
-        cislo = soup.select("tr")[i].text.split("\n")[1]
-        mesto = soup.select("tr")[i].text.split("\n")[2]
-        new_radek.append(cislo)  # cislo
-        new_radek.append(mesto)  # nazev
-        hledam_odkazy = soup.select("tr")[i].select("a")[0].get("href")
-
-        new_url = "https://volby.cz/pls/ps2017nss/" + (
-            hledam_odkazy)  # odkaz z cisla
-        new_soup = get_soup(new_url)
-
-        ## z jednotlivych odkazu taham udaje z vrchni tabulky
-        vysledky = new_soup.select("td.cislo")
-        new_radek.append(vysledky[3].text)  # voliči v seznamu
-        new_radek.append(vysledky[4].text)  # vydané obálky
-        new_radek.append(vysledky[7].text)  # platné hlasy
-
-        strany = []
-        ## Z prvniho odkazu vytaham nazvy stran a pak vysledky pro jednotlive strany ze vsech odkazu
-        for j in (range(5, 32)):
-            if j not in range(18, 20):
-                strany.append(new_soup.select("tr")[j].text.split("\n")[2])
-                if i == 2:
-                    csv_tabulka.append(
-                        new_soup.select("tr")[j].text.split("\n")[2])
-                new_radek.append(new_soup.select("tr")[j].text.split("\n")[3])
+        new_radek.append(cisla[i])
+        new_radek.append(obce[i])
+        new_radek += jednotlive_obce(odkazy[i])
         tabulka.append(new_radek)
 
 
-# def jmena_stran(new_soup):
-#     for i in (range(5, 32)):
-#         if i not in range(18, 20):
-#             csv_tabulka.append(new_soup.select("tr")[i].text.split("\n")[2])
+def jmena_stran(new_url):
+    data_obce = pd.read_html(new_url, encoding='utf-8')
+    vysledky = data_obce[1].values.tolist() + data_obce[2].values.tolist()
+    for radek in vysledky:
+        if radek[0] != "-":
+            csv_tabulka.append(radek[1])
+
+
+def jednotlive_obce(new_url):
+    data_obce = pd.read_html(new_url, encoding='utf-8')
+    info = data_obce[0].values.tolist()
+    vysledek = [info[0][3], info[0][4], info[0][7]]
+    vysledky = data_obce[1].values.tolist() + data_obce[2].values.tolist()
+    for radek in vysledky:
+        if radek[0] != "-":
+            vysledek.append(radek[2])
+    return vysledek
+
+
+def stahnout_odkazy(soup):
+    odkazy = soup.find_all("tr")
+    links = []
+    for odkaz in odkazy:
+        try:
+            links.append("https://volby.cz/pls/ps2017nss/" + odkaz.select("a")[0].get("href"))
+        except:
+            pass
+    return links
+
+
+def uzemni_celek(url):
+    cisla = []
+    obce = []
+    info = (pd.read_html(url, encoding='utf-8'))
+    for sloupec in info:
+        for sl in sloupec.values.tolist():
+            if sl[0] != "-":
+                cisla.append(sl[0])
+                obce.append(sl[1])
+    return [cisla, obce]
 
 
 def zapsat_data(filename):
