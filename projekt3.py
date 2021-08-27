@@ -58,7 +58,9 @@ def stahnout_odkazy(soup):
     links = []
     for odkaz in odkazy:
         try:
-            links.append("https://volby.cz/pls/ps2017nss/" + odkaz.select("a")[0].get("href"))
+            links.append(
+                "https://volby.cz/pls/ps2017nss/" + odkaz.select("a")[0].get(
+                    "href"))
         except:
             pass
     return links
@@ -88,8 +90,8 @@ def zapsat_data(filename):
 
 def main():
     try:
-        url=sys.argv[1]
-        nazev_csv=sys.argv[2]
+        url = sys.argv[1]
+        nazev_csv = sys.argv[2]
         get_soup(url)
     except:
         print(
