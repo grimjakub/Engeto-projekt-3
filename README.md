@@ -36,7 +36,6 @@ Stahuji data z vybrané URL: https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj
 Ukládám výsledky do souboru: vysledky_prostejov.csv
 
 Data zapsaná úspěšně do tabulky
-
 ```
 
 Částěčný výstup programu, který se zapíše do souboru:
