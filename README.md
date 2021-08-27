@@ -37,7 +37,6 @@ Ukládám výsledky do souboru: vysledky_prostejov.csv
 
 Data zapsaná úspěšně do tabulky
 
-Ukoncuji program projekt3.py
 ```
 
 Částěčný výstup programu, který se zapíše do souboru:
@@ -52,5 +51,5 @@ Při nesprávném zadání příkazu (špatná URL adresa, chybějící argument
 
 ```
 Musíte zadat správnou URL adresu a název CSV souboru
-                    ---EXIT---
+---EXIT---
 ```
